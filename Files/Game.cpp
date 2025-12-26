@@ -5,36 +5,30 @@
 #include "imgui/imgui_impl_sdlrenderer3.h"
 #include "Game.h"
 #include "Renderer.h"
+#include"UI.h"
 #include<iostream>
 
 // ce namespace va contenir toutes les fonctions de jeu
 namespace Games
 {
+
+       
+
  // lancement du jeu 
 void mainmenu ()
 {
-   // initialisation video et audio
-    SDL_Init (SDL_INIT_VIDEO);
+    // initialisation video et audio
+        SDL_Init (SDL_INIT_VIDEO);
 
-    // cretion de fenetre
-    SDL_Window* Window= SDL_CreateWindow ("space invaders" , 800 , 600 , SDL_WINDOW_RESIZABLE);
-    
-    // creation d'un rendu
-    SDL_Renderer* Renderer = SDL_CreateRenderer(Window , nullptr);
-
-    // intialisation de Dear ImGui
-
-        // creation du contexte ImGui
+        // cretion de fenetre
+        SDL_Window* Window= SDL_CreateWindow ("space invaders" , 800 , 600 , SDL_WINDOW_RESIZABLE);
         
-        ImGui::CreateContext();
-      
+        // creation d'un rendu
+        SDL_Renderer*Renderer = SDL_CreateRenderer(Window , nullptr);
 
-     // 2. Initialiser les plateformes (le lien entre la fenêtre et le rendu)
-         ImGui_ImplSDL3_InitForSDLRenderer(Window, Renderer);
-         ImGui_ImplSDLRenderer3_Init(Renderer);
-   
-     // selection d'un style
-        ImGui::StyleColorsDark();
+        // initialisation de ImGui
+        ImGUI::InitialiserImgui(Window , Renderer);
+    
 
 
     // boucle d'evenements
@@ -45,6 +39,9 @@ void mainmenu ()
      {
         while (SDL_PollEvent(&e))
         {
+           // transmettre l'événement à ImGui
+           ImGui_ImplSDL3_ProcessEvent(&e);
+
            if (e.type== SDL_EVENT_QUIT)
            {
               run = false ;
@@ -52,8 +49,12 @@ void mainmenu ()
         }
 
          Rendu::MenuPrincipal (Renderer);
+         ImGUI::menuprincipalIMGUI (Window , Renderer);
      }
     
+
+      ImGUI::nettoyageImgui(Window , Renderer);
+      Rendu::nettoyageSDL (Window , Renderer);
    
 }
 }
