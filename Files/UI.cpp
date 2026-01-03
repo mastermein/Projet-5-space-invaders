@@ -1,9 +1,9 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_sdl3.h"
 #include "imgui/imgui_impl_sdlrenderer3.h"
-#include"UI.h"
+#include "UI.h"
 #include "Renderer.h"
-#include<SDL3/SDL.h>
+#include <SDL3/SDL.h>
 
 
 namespace ImGUI 
@@ -22,7 +22,7 @@ namespace ImGUI
 
   }
 
-  void menuprincipalIMGUI (SDL_Window* Window , SDL_Renderer* Renderer)
+  void menuprincipalIMGUI (SDL_Window* Window , SDL_Renderer* Renderer , bool& run, bool& playing)
   {
     // debut de la frame ImGui
     ImGui_ImplSDLRenderer3_NewFrame();
@@ -36,12 +36,17 @@ namespace ImGUI
     //buttons du menu principal
     ImGui::Begin ("Menu Principal" , nullptr , window_flags);
     if (ImGui::Button ("1 Joueur"))
-    {}
+    {
+       // activer l'état de jeu : passer en mode "playing"
+       playing = true;
+    }
     
        ImGui::Dummy (ImVec2 (0, 10)); // espace entre les boutons
 
     if (ImGui::Button ("Quitter"))
-    {}
+    { 
+      run = false;
+    }
 
     // fin de la frame ImGui
     ImGui::End();
@@ -54,7 +59,7 @@ namespace ImGUI
 
   }
 
-
+  // nettoyage de ImGui
    void nettoyageImgui(SDL_Window* Window , SDL_Renderer* Renderer)
    {
     ImGui_ImplSDLRenderer3_Shutdown();
