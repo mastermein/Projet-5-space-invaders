@@ -1,12 +1,23 @@
 #include<SDL3/SDL.h>
+#include "Utils.h"
 namespace Rendu 
 { 
-   struct vector
-   {
-     float x;
-     float y;
-   };
-   extern vector positionjoueur;
+
+   // Textures partagées
+   extern SDL_Texture* joueurtexture;
+   extern SDL_Texture* enemytexture;
+   extern SDL_Texture* fond_texture;
+   extern SDL_Texture* tirtexture;
+   extern SDL_Texture* explosiontexture;
+
+   // Instances globales
+   extern Joueur Joueur1;
+   extern Enemies Enemy1;
+   extern Projectile Tir1;
+   extern Projectile Tir2;
+
+    // extern std::vector<Enemies> Enemies::listeEnnemis; // gestion de plusieurs enemies
+
 
    void MenuPrincipal(SDL_Renderer* Renderer);
 
@@ -21,4 +32,6 @@ namespace Rendu
    void cleanupGameTextures();
 
    void nettoyageSDL (SDL_Window* Window , SDL_Renderer* Renderer);
+
+   void collision(SDL_Renderer* Renderer);
 }

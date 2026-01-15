@@ -5,41 +5,92 @@
 #include <vector>
 
 // structure d'un projectile
-struct projectile
+struct Projectile
 {
     SDL_Texture* texture;
     SDL_FRect rect;
     SDL_FPoint pos;
     float speed;
-    bool active;
+    bool Pactive;
 };
 
-// structure d'un joueur
-struct joueur
+// classe d'un joueur
+class Joueur
 {
-    SDL_Texture* texture;
-    SDL_FRect rect;
-    SDL_FPoint pos;
+ public:
+    Joueur();
+    ~Joueur();
+
+    void Initialisation(SDL_Texture* j , SDL_Texture* ex ,SDL_Texture* t , float x , float y );
+    void Evenements(const bool* state);
+    void exploser(SDL_Renderer* Renderer , SDL_Texture* boom );
+
+    void Update();
+    void Rendu(SDL_Renderer* Renderer);
+
+    // gestion des projectiles du joueur (plusieurs projectiles simultanement)
+    std::vector<Projectile> projectiles;
+
+
+    SDL_Texture* joueurtexture;  // image du joueur
+    SDL_Texture* explosiontexture; // image d'explosion
+    SDL_Texture* tirtexture;  // image de projectile
+
+    SDL_FRect rectj;
+    SDL_FPoint posj;
+
     float speed;   
     int Vies;
-    bool active;
+    bool Jactive;
+
+    Uint64 dernierTir = 0;
+    Uint64 delaiTir = 500 ; // vitesse de tir du joueur
+
+    Uint64 debutexplosion = 0;
+    Uint64 dureexplosion = 500;
+    
 };
 
 // structure d'un ennemi
-struct enemies 
-{
-    SDL_Texture* texture;
-    SDL_FPoint pos;
-    SDL_FRect rect;
+class Enemies 
+{  
+   public:
+      Enemies();
+      ~Enemies();
+      
+    void Initialisation(SDL_Texture* enemytexture, SDL_Texture* explosiontexture, SDL_Texture* tirtexture, float x, float y);
+    void Evenements(); 
+    void Update();
+    void exploser(SDL_Renderer* Renderer , SDL_Texture* boom );
+    void Rendu(SDL_Renderer* Renderer);
+    
+
+    // projectiles de l'ennemi (gestion de plusieurs projectiles simultanement)
+    std::vector<Projectile> projectiles;
+
+
+    SDL_Texture* enemytexture;
+    SDL_Texture* explosiontexture;
+    SDL_Texture* tirtexture;
+
+    SDL_FRect recte;
+    SDL_FPoint pose;
+    
+
+    //mouvements
     float speed;
-    bool active;
+    bool Eactive;
+
+    Uint64 dernierTir = 0;
+    Uint64 delaiTir = 2000 ; // L'ennemi tire toutes les secondes
+  
+    Uint64 debutexplosion = 0;
+    Uint64 dureexplosion = 500;
+    
+    static std::vector<Enemies> listeEnnemis;
 };
 
-
-    extern joueur joueur1;
-    extern enemies enemy1;
-    extern projectile tir1;
-    extern projectile tir2;
+void collision();
 
 
 #endif 

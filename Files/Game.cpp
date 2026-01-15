@@ -42,6 +42,7 @@ namespace Games
     // boucle d'evenements
     bool run = true ;
     SDL_Event e;
+    Uint64 lastTick = SDL_GetTicks();  // variable qui recupere le temps actuel
 
      while(run)
      {
@@ -60,23 +61,21 @@ namespace Games
            {
               switch(e.key.key)
               {
-                case SDLK_A: Rendu::positionjoueur.x -= 30.0f ; break;
-                case SDLK_D: Rendu::positionjoueur.x += 30.0f ; break;
+                
                 case SDLK_ESCAPE: playing = false ; break;
-                case SDLK_T: Rendu::projectilesjoueur(Renderer , Rendu::positionjoueur.x + 20.0f , Rendu::positionjoueur.y); break;
+               
               }
            }
 
-           if (playing == true)
-           {
-            std::srand(std::time(0));
-            int rand = std::rand() % 100;
-            if (rand < 10)
-            {
-                Rendu::projectilesennemi(Renderer , Rendu::enemy1.pos.x + 15.0f , Rendu::enemy1.pos.y + 50.0f);
-           }
            
-        }
+        }  
+        
+        const bool* state = SDL_GetKeyboardState(nullptr);
+         
+        
+        
+
+         
 
         // Rendu par frame (ne pas bloquer)
         SDL_RenderClear (Renderer);
@@ -88,6 +87,7 @@ namespace Games
         }
         else
         { 
+           
            Rendu::playing(Renderer);
         }
 
@@ -98,5 +98,25 @@ namespace Games
       Rendu::cleanupGameTextures();
       Rendu::nettoyageSDL (Window , Renderer);
  }
-}
+
+  /* void collision()
+ {
+   for (auto& p : Joueur1.projectiles)
+   {
+      if ( p.Pactive == false)
+      {
+         continue;
+      }
+
+      for (auto& e : Rendu::listeEnnemis)
+      {
+                if( e.Eactive  == true && SDL_HasRectIntersectionFloat (&p.rect , &e.recte) )
+                {
+                  p.Pactive = false ; 
+                  e.Eactive = false ;
+                }
+
+      }
+   }
+ } */
 } // fin du namespace Games
