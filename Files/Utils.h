@@ -40,8 +40,10 @@ class Joueur
     SDL_FPoint posj;
 
     float speed;   
-    int Vies;
+    int vies;
     bool Jactive;
+    bool findepartie;
+    static int score;
 
     Uint64 dernierTir = 0;
     Uint64 delaiTir = 500 ; // vitesse de tir du joueur
@@ -63,11 +65,9 @@ class Enemies
     void Update();
     void exploser(SDL_Renderer* Renderer , SDL_Texture* boom );
     void Rendu(SDL_Renderer* Renderer);
-    
 
     // projectiles de l'ennemi (gestion de plusieurs projectiles simultanement)
     std::vector<Projectile> projectiles;
-
 
     SDL_Texture* enemytexture;
     SDL_Texture* explosiontexture;
@@ -76,10 +76,12 @@ class Enemies
     SDL_FRect recte;
     SDL_FPoint pose;
     
-
     //mouvements
-    float speed;
+    float speedx;
+    float speedy;
     bool Eactive;
+    bool spawn = false;
+    int vagues;
 
     Uint64 dernierTir = 0;
     Uint64 delaiTir = 2000 ; // L'ennemi tire toutes les secondes

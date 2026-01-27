@@ -16,19 +16,19 @@
 // ce namespace va contenir toutes les fonctions de jeu
 namespace Games
 {
-
-       
+      bool Playing = false;
+      
 
  // lancement du jeu 
  void mainmenu ()
  {
-   bool playing = true;
+
    
     // initialisation video et audio
         SDL_Init (SDL_INIT_VIDEO);
 
         // cretion de fenetre
-        SDL_Window* Window= SDL_CreateWindow ("space invaders" , 800 , 800 , SDL_WINDOW_RESIZABLE);
+        SDL_Window* Window= SDL_CreateWindow ("space invaders" , 800 , 800, 0  );
         
         // creation d'un rendu
         SDL_Renderer* Renderer = SDL_CreateRenderer(Window , nullptr);
@@ -42,7 +42,7 @@ namespace Games
     // boucle d'evenements
     bool run = true ;
     SDL_Event e;
-    Uint64 lastTick = SDL_GetTicks();  // variable qui recupere le temps actuel
+   // Uint64 lastTick = SDL_GetTicks();  // variable qui recupere le temps actuel
 
      while(run)
      {
@@ -62,7 +62,7 @@ namespace Games
               switch(e.key.key)
               {
                 
-                case SDLK_ESCAPE: playing = false ; break;
+                case SDLK_ESCAPE: Playing = false ; break;
                
               }
            }
@@ -70,7 +70,7 @@ namespace Games
            
         }  
         
-        const bool* state = SDL_GetKeyboardState(nullptr);
+      //  const bool* state = SDL_GetKeyboardState(nullptr);
          
         
         
@@ -78,23 +78,40 @@ namespace Games
          
 
         // Rendu par frame (ne pas bloquer)
+        SDL_SetRenderDrawColor(Renderer, 0 , 0 , 0 , 255);
         SDL_RenderClear (Renderer);
         
-        if (playing == false)
+        ImGui_ImplSDL3_NewFrame();
+        ImGui_ImplSDLRenderer3_NewFrame();
+        ImGui::NewFrame();
+        
+        if (Playing == false)
         { 
            Rendu::MenuPrincipal (Renderer);
-           ImGUI::menuprincipalIMGUI (Window , Renderer , run, playing);
+           ImGUI::menuprincipalIMGUI (run);
+           
+           
         }
         else
         { 
-           
            Rendu::playing(Renderer);
+           ImGUI::PlayingImGui( Rendu::Joueur1);
+
+         
+
+           
         }
 
+        ImGui::Render();
+        ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), Renderer);
+
+        
+
+        SDL_RenderPresent(Renderer);
         SDL_Delay (16); // pour limiter à environ 60 FPS
      }
 
-      ImGUI::nettoyageImgui(Window , Renderer);
+      ImGUI::nettoyageImgui();
       Rendu::cleanupGameTextures();
       Rendu::nettoyageSDL (Window , Renderer);
  }

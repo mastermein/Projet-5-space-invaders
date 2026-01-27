@@ -6,6 +6,7 @@
 
 
 // constructeurs joueur
+int Joueur::score = 0;
 
 Joueur::Joueur()
 {
@@ -21,9 +22,11 @@ Joueur::Joueur()
     rectj.x = posj.x;
     rectj.y = posj.y;
 
-    speed = 10.0f;
-    Vies = 3;
-
+    speed = 5.0f;
+    vies = 3;
+    score = 0;
+    
+    findepartie = false;
     Jactive = true;
 }
 
@@ -45,25 +48,39 @@ void Joueur::Initialisation(SDL_Texture* j , SDL_Texture* ex ,SDL_Texture*t , fl
 
       rectj.x = x;
       rectj.y = y;
+       
+          vies = 3;
+          score = 0;
 
       Jactive = true;
+      findepartie = false;
 }
 
 void Joueur::Evenements(const bool* state)
 {
     
     
-        if (state[SDL_SCANCODE_A])
+        if (state[SDL_SCANCODE_LEFT])
         {
             posj.x -= speed;
         }
 
-        if (state[SDL_SCANCODE_D])
+        if (state[SDL_SCANCODE_RIGHT])
         {
             posj.x += speed;
         }
 
-        if (state[SDL_SCANCODE_T])
+        if (state[SDL_SCANCODE_UP])
+        {
+            posj.y -= speed;
+        }
+
+        if (state[SDL_SCANCODE_DOWN])
+        {
+            posj.y += speed;
+        }
+
+        if (state[SDL_SCANCODE_KP_7])
         {
                Uint64 TempsActuel = SDL_GetTicks(); // Recupere le temps actuel
 
@@ -95,37 +112,82 @@ void Joueur::Evenements(const bool* state)
     
 
       // empecher le joueur de sortir de la fenetre
-    if (posj.x < 25.0f)
+    if (posj.x < 0.0f)
     {
-        posj.x = 25.0f ;
+        posj.x = 0.0f ;
     }
     if (posj.x > 775.0f)
     {
         posj.x = 775.0f;
     }
+    if (posj.y > 775.0f)
+    {
+        posj.y = 775.0f;
+    }
+    if (posj.y < 0.0f)
+    {
+        posj.y = 0.0f;
+    }
 }
 
 void Joueur::exploser(SDL_Renderer* Renderer , SDL_Texture* boom)
 {
-    Uint64 debut = SDL_GetTicks();
-    if (debut > debutexplosion + dureexplosion)
+    (void)Renderer;
+    (void)boom;
+
+    if (Jactive == true)
     {
        
-        joueurtexture = boom;
-        SDL_RenderTexture(Renderer , joueurtexture , nullptr , &rectj );
+        vies -= 1;
+     Jactive = false;
 
-
+        if ( vies < 1)
+        {
+            findepartie = true;
+        }
     }
-     Jactive == false;
-    joueurtexture = nullptr;
 }
+
+     //   joueurtexture = boom;
+       // SDL_RenderTexture(Renderer , joueurtexture , nullptr , &rectj );
+
+        
+    
+
+    
+ /*   joueurtexture = nullptr;
+    
+    if (SDL_GetTicks() > 2000)
+    {
+        if(vies < 1)
+        {
+            findepartie = true;
+        }
+        else
+        {
+            Jactive = true;
+        }
+    }
+    
+}  */
 
 void Joueur::Update()
 {
     rectj.x = posj.x;
     rectj.y = posj.y;
 
-    for (auto &p : projectiles) // parcourir tous les projectiles du conteneur STD::VECTOR
+    if (Jactive == false && findepartie == false)
+    {
+        if (SDL_GetTicks() > 2000)
+        {
+            Jactive = true;
+            posj.x = 400.0f;
+            posj.y = 700.0f;
+        }
+    }
+
+
+   for(auto &p : projectiles) // parcourir tous les projectiles du conteneur STD::VECTOR
     {
         if (p.Pactive == true)
         {
@@ -137,7 +199,20 @@ void Joueur::Update()
             }
         }
     }
-} 
+
+    /* if (Jactive == false && SDL_GetTicks() > 2000)
+    {
+        if (vies > 0)
+        {
+            Jactive = true;
+        }
+        else 
+        {
+            joueurtexture = nullptr; //le joueur meurt
+        }
+    }
+} */
+}
 
 void Joueur::Rendu(SDL_Renderer* Renderer)
 {
@@ -172,14 +247,17 @@ Enemies::Enemies()
    explosiontexture = nullptr;
    tirtexture = nullptr;
    
+   pose.x = rand()%700;
+   pose.y = rand()%500;
 
     recte.w = 50.0f;
     recte.h = 50.0f;
     recte.x = pose.x;
     recte.y = pose.y;
 
-    speed = 5.0f;
-    Eactive = true;
+    speedx = 1.0f;
+    speedy = 1.0f;
+    Eactive = false;
 
     
 
@@ -203,7 +281,8 @@ void Enemies::Initialisation(SDL_Texture* en , SDL_Texture* e , SDL_Texture* t ,
     
         recte.x = pose.x;
         recte.y = pose.y;
-        speed = 5.0f;
+        speedx = 1.0f;
+        speedy = 1.0f;
     
         Eactive = true;
 }
@@ -215,7 +294,7 @@ void Enemies::Evenements()
     if (Eactive == true)
     {
         Uint64 TempsActuel = SDL_GetTicks();
-        if (TempsActuel > dernierTir + delaiTir)
+        if (TempsActuel > dernierTir + delaiTir && rand()%100 == 90)
         {
             Projectile p;
             p.Pactive = true;
@@ -275,23 +354,38 @@ void Enemies::Evenements()
         
     }
     enemytexture = nullptr;
-    Eactive == false;
+    Eactive = false;
+    
+    Joueur::score += 100;
 }
 
 void Enemies::Update()
 {
-   pose.x += speed;
+   pose.x += speedx;
+   pose.y += speedy;
    
    if (pose.x >= 775.0f)
    {
        pose.x = 775.0f;
-       speed = -speed;  // quand il atteint un mur il change de direction
+       speedx = -speedx;  // quand il atteint un mur il change de direction
    }
 
    else if (pose.x <= 25.0f)
    {
     pose.x = 25.0f;
-    speed = -speed;
+    speedx = -speedx;
+   }
+
+   if (pose.y >= 500.0f)
+   {
+    pose.y = 500.0f;
+    speedy = -speedy;
+
+   }
+   else if (pose.y <= 0.0f)
+   {
+    pose.y = 0.0f;
+    speedy = -speedy;
    }
 
    recte.x = pose.x;

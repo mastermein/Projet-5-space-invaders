@@ -1,11 +1,18 @@
 #include <SDL3/SDL.h>
+#include "Utils.h"
+
 
 namespace ImGUI 
 {
+      extern SDL_Texture* joueurtexture;
+      
+
   void InitialiserImgui(SDL_Window* Window , SDL_Renderer* Renderer);
 
-  void menuprincipalIMGUI (SDL_Window* Window , SDL_Renderer* Renderer, bool& run, bool& playing);
+  void menuprincipalIMGUI (bool& run);
 
-  void nettoyageImgui(SDL_Window* Window , SDL_Renderer* Renderer);
+  void PlayingImGui(Joueur& player);
+
+  void nettoyageImgui();
 
 }

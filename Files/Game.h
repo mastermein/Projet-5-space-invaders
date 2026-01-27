@@ -3,6 +3,7 @@
 namespace Games
 {
     //
+    extern bool Playing;
        extern Joueur Joueur1;
    extern Enemies Enemy1;
    extern Projectile Tir1;

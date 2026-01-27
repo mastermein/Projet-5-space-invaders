@@ -9,6 +9,8 @@ namespace Rendu
    extern SDL_Texture* fond_texture;
    extern SDL_Texture* tirtexture;
    extern SDL_Texture* explosiontexture;
+   extern SDL_Texture* viestexture;
+   extern SDL_Texture* MenuPrincipaltexture;
 
    // Instances globales
    extern Joueur Joueur1;
@@ -34,4 +36,8 @@ namespace Rendu
    void nettoyageSDL (SDL_Window* Window , SDL_Renderer* Renderer);
 
    void collision(SDL_Renderer* Renderer);
+
+   void enemiesspawn(int vagues);
+
+   void enemisupdatespawn();
 }

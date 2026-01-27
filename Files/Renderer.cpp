@@ -9,6 +9,9 @@
    
 
 std::vector<Enemies> Enemies::listeEnnemis;
+int vagues = 1;
+bool vagueactive = true;
+
 
 
 
@@ -21,6 +24,8 @@ namespace Rendu
     SDL_Texture* enemytexture = nullptr;
     SDL_Texture* tirtexture = nullptr;
     SDL_Texture* explosiontexture = nullptr;
+    SDL_Texture* viestexture = nullptr;
+    SDL_Texture* MenuPrincipaltexture = nullptr;
 
     
     Joueur Joueur1;
@@ -42,24 +47,27 @@ namespace Rendu
 
     void initGameTextures(SDL_Renderer* Renderer)
     {
-        joueurtexture = IMG_LoadTexture(Renderer, "Images/player1.jpeg");
-        enemytexture = IMG_LoadTexture(Renderer, "Images/player2.jpeg");
+        joueurtexture = IMG_LoadTexture(Renderer, "Images/player1.png");
+        enemytexture = IMG_LoadTexture(Renderer, "Images/player2.png");
         fond_texture = IMG_LoadTexture(Renderer, "Images/fond.jpeg");
-        tirtexture = IMG_LoadTexture(Renderer, "Images/tir.jpeg");
-        explosiontexture = IMG_LoadTexture(Renderer, "Images/boom.jpeg");
+        tirtexture = IMG_LoadTexture(Renderer, "Images/tir.png");
+        explosiontexture = IMG_LoadTexture(Renderer, "Images/boom.png");
+        viestexture = IMG_LoadTexture(Renderer, "Images/player1.png");
+        MenuPrincipaltexture = IMG_LoadTexture (Renderer , "Images/menuprincipal.jpeg" );
+
 
         // initialiser joueur
         Joueur1.Initialisation(joueurtexture, explosiontexture, tirtexture, 400.0f, 700.0f);
 
         
          
-         for (int i = 0 ; i < 5 ; i++)
+        /* for (int i = 0 ; i < 5 ; i++)
          {
             Enemies e;
 
             e.Initialisation(enemytexture , explosiontexture , tirtexture , 100.0f + (i * 150.0f) , 100.0f);
             Enemies::listeEnnemis.push_back(e);
-         }
+         } */
     }
 
     void cleanupGameTextures()
@@ -72,12 +80,13 @@ namespace Rendu
         if (fond_texture) SDL_DestroyTexture(fond_texture);
         if (Tir1.texture) SDL_DestroyTexture(Tir1.texture);
         if (Tir2.texture) SDL_DestroyTexture(Tir2.texture);
+        if (viestexture) SDL_DestroyTexture(viestexture);
+        if(MenuPrincipaltexture) SDL_DestroyTexture(MenuPrincipaltexture);
     }
 
     void MenuPrincipal(SDL_Renderer* Renderer)
     {
         
-     SDL_Texture* MenuPprincipal = IMG_LoadTexture (Renderer , "Images/menuprincipal.jpeg" );
 
     // remise des parametres de jeu a zero
 
@@ -87,12 +96,16 @@ namespace Rendu
        Enemies::listeEnnemis.clear();
     
          
-        for (int i=0 ; i<5 ; i++)
+       /* for (int i=0 ; i<5 ; i++)
         {
             Enemies e;
             e.Initialisation(enemytexture , explosiontexture , tirtexture , 100.0f + (i * 150.0f) , 100.0f);
             Enemies::listeEnnemis.push_back(e);
         }
+
+        */
+
+
     
     
 
@@ -100,19 +113,25 @@ namespace Rendu
 
     // nettoyage de l'ecran et affichage de l'image (présentation effectuée après le rendu ImGui)
     SDL_RenderClear (Renderer);
-    SDL_RenderTexture (Renderer , MenuPprincipal , nullptr , nullptr );
+    SDL_RenderTexture (Renderer , MenuPrincipaltexture , nullptr , nullptr );
 
-    SDL_DestroyTexture (MenuPprincipal);
+    // SDL_DestroyTexture (MenuPprincipal);
     }
 
 
     void playing (SDL_Renderer* Renderer)
     {
 
+      if(Joueur1.findepartie == true)
+      {
+        Games::Playing = false;
+      }
+
+
      const bool* state = SDL_GetKeyboardState(nullptr);
     
       Joueur1.Evenements(state);
-
+      
          
       // verification des collisions 
         
@@ -128,6 +147,9 @@ namespace Rendu
         SDL_RenderTexture(Renderer, fond_texture, nullptr, nullptr);
         Joueur1.Rendu(Renderer);
         Enemy1.Rendu(Renderer);
+
+        Rendu::enemiesspawn(vagues);
+        Rendu::enemisupdatespawn();
 
         for(auto& e : Enemies::listeEnnemis)
         {
@@ -159,8 +181,7 @@ namespace Rendu
         // Mettre à jour et rendre le tir de l'ennemi s'il est actif
         
 
-        // présenter le rendu
-        SDL_RenderPresent(Renderer);
+        
     }
 
 
@@ -223,13 +244,81 @@ namespace Rendu
                           {
                              if (SDL_HasRectIntersectionFloat(&en.rect , &Rendu::Joueur1.rectj))
                               {
-                            en.Pactive == false;
-                            Rendu::Joueur1.Jactive == false;
+                            en.Pactive = false;
+                            Rendu::Joueur1.Jactive = false;
                             Rendu::Joueur1.exploser(Renderer , explosiontexture);
+                            Joueur1.vies -=1;
                               }
                           }
                      }
                 }
             }
-        }       
+        } 
+        
+    void enemiesspawn (int vagues)
+    {
+        if (vagueactive == false)
+        {
+            
+       
+        
+
+        for (int i = 0 ; i < vagues ; i++)
+        {
+            Enemies e;
+
+            SDL_GetTicks();
+
+            
+
+          float x = 50.0f + rand()% 700;
+          float y = 20.0f + rand()% 200;
+         
+         // if(SDL_GetTicks() < 500)
+         // {
+          e.Initialisation(enemytexture , explosiontexture , tirtexture , x , y);
+          e.Eactive = true;
+          Enemies::listeEnnemis.push_back(e);
+         // }
+        } 
+
+         vagueactive = true;
+
+        }
+
+
+          
+    }
+
+    void enemisupdatespawn()
+    {
+        if (Enemies::listeEnnemis.empty())
+        {
+            vagueactive = false;
+            return;
+        }
+        
+          bool encoredesenemis = false;
+        for (auto& p : Enemies::listeEnnemis)
+        {
+            if (p.Eactive == true)
+            {
+                encoredesenemis = true;
+                break;
+            }
+        }
+
+            if (encoredesenemis == false)
+            {
+                vagues++;
+                Enemies::listeEnnemis.clear();
+                vagueactive = false;
+            }
+        
+
+        
+
+            
+          
+    }
 }
